@@ -1,3 +1,3 @@
-# MyLibrary
+# MANetwork
 
-A description of this package.
+My own Network layer.

@@ -1,7 +1,7 @@
 import XCTest
 
-import MyLibraryTests
+import MANetworkTests
 
 var tests = [XCTestCaseEntry]()
-tests += MyLibraryTests.allTests()
+tests += MANetworkTests.allTests()
 XCTMain(tests)
