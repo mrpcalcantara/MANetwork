@@ -21,7 +21,7 @@ struct TestHelper {
         var inputParameters: [HTTPRequestInputParameter] = [.path("{user}", "mrpcalcantara")]
     }
     class TestRequest: HTTPRequest {
-        var headers: HTTPHeaders? { HTTPHeaders() }
+        var headers: HTTPHeaders?
         var method: HTTPMethod { .get }
         var inputData: TestRequestInputData
         var url: String = "https://api.github.com/users/{user}/events"
@@ -34,7 +34,8 @@ struct TestHelper {
         
         // MARK: - Initializers
         
-        init() {
+        init(headers: HTTPHeaders = HTTPHeaders()) {
+            self.headers = headers
             inputData = TestRequestInputData()
         }
     }
@@ -55,6 +56,16 @@ class MANetworkTests: XCTestCase {
 
     let client = HTTPClient()
     var disposables = Set<AnyCancellable>()
+
+    func testHTTPRequest_build_noHeaders() throws {
+        let request = TestHelper.TestRequest()
+        XCTAssert(request.headers?.isEmpty == true, "Headers should be empty.")
+    }
+
+    func testHTTPRequest_build_withHeaders() throws {
+        let request = TestHelper.TestRequest(headers: ["Accept":"application/json"])
+        XCTAssert(request.headers?.isEmpty == false, "Headers should NOT be empty. it has \(request.headers?.count)")
+    }
 
     func testHTTPRequestProtocol_noCombine() throws {
         // This is an example of a functional test case.

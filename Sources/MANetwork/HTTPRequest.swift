@@ -133,17 +133,15 @@ public extension HTTPRequest {
     }
     
     func buildRequest<T: HTTPRequestInputDataProtocol>(inputData: T? = nil) -> URLRequest {
-        return buildRequest(for: url,
-                            queryParameters: inputData?.queryParameters,
+        return buildRequest(queryParameters: inputData?.queryParameters,
                             pathParameters: inputData?.pathParameters,
                             bodyParameters: inputData?.bodyParameters)
     }
     
     
-    private func buildRequest(for url: String,
-                      queryParameters: [HTTPQueryParameterProtocol]?,
-                      pathParameters: [HTTPPathParameterProtocol]?,
-                      bodyParameters: HTTPBody?) -> URLRequest {
+    private func buildRequest(queryParameters: [HTTPQueryParameterProtocol]?,
+                              pathParameters: [HTTPPathParameterProtocol]?,
+                              bodyParameters: HTTPBody?) -> URLRequest {
 
         var mappedURL = url
         if let pathParameters = pathParameters { addPathParameters(&mappedURL, for: pathParameters) }
@@ -151,7 +149,7 @@ public extension HTTPRequest {
               let url = urlComponents.url else { return URLRequest.init(url: URL(string: "")!) }
         
         var request = URLRequest(url: url)
-        
+        request.allHTTPHeaderFields = headers
         if let auth = auth { updateAuthentication(&request, for: auth) }
         if let queryParameters = queryParameters { addQueryParameters(&urlComponents, for: queryParameters) }
         if let requestBody = bodyParameters { request.httpBody = requestBody }
