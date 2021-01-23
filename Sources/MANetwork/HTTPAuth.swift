@@ -26,7 +26,9 @@ public protocol HTTPAuthentication {
     var headerValue: String? { get }
 }
 
-/// Struct implementation of the HTTPAuthentication protocol.
-public struct HTTPAuth {
-    
+public extension HTTPAuthentication {
+    var headerToken: HTTPHeaders? {
+        guard let name = headerName, let value = headerValue else { return nil }
+        return [name: value]
+    }
 }

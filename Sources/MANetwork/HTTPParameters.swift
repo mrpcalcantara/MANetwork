@@ -12,7 +12,7 @@ import Foundation
 /**
  Enum that represents the HTTP input parameter type.
  */
-enum HTTPInputType {
+public enum HTTPInputType {
     case query
     case path
     case body
@@ -101,7 +101,7 @@ public protocol HTTPRequestInputDataProtocol {
     var bodyParameters: HTTPBody? { get }
 }
 
-extension HTTPRequestInputDataProtocol {
+public extension HTTPRequestInputDataProtocol {
     
     var queryParameters: [HTTPQueryParameterProtocol]? {
         inputParameters
@@ -214,7 +214,7 @@ protocol HTTPBodyParameterProtocol {
  - parameters:
     - value: the value of the parameter to be encoded and added to the body of the HTTP request. Must conform to the Codable protocol.
 */
-struct HTTPBodyParameter: HTTPBodyParameterProtocol {
+public struct HTTPBodyParameter: HTTPBodyParameterProtocol {
     
     var value: AnyObject
     
