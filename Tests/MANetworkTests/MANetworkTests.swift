@@ -64,7 +64,7 @@ class MANetworkTests: XCTestCase {
 
     func testHTTPRequest_build_withHeaders() throws {
         let request = TestHelper.TestRequest(headers: ["Accept":"application/json"])
-        XCTAssert(request.headers?.isEmpty == false, "Headers should NOT be empty. it has \(request.headers?.count)")
+        XCTAssert(request.headers?.isEmpty == false, "Headers should NOT be empty. it has \(String(describing: request.headers?.count))")
     }
 
     func testHTTPRequestProtocol_noCombine() throws {
@@ -85,6 +85,17 @@ class MANetworkTests: XCTestCase {
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 10)
+    }
+
+    func testHTTPRequestProtocol_noCombine_async() async throws {
+        // This is an example of a functional test case.
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        
+        let request = TestHelper.TestRequest()
+        let response: HTTPClientResponse<[TestHelper.GitHubUser]> = try await client.execute(httpRequest: request)
+        guard let entity = response.entity.first else { return XCTFail("No user found") }
+        print(entity)
+        XCTAssert(!entity.actor.login.isEmpty, "Should contain value")
     }
 
     func testHTTPRequestProtocol_combine() throws {

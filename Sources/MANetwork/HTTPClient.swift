@@ -32,7 +32,7 @@ public typealias DownloadDataCompletionType = ((Result<Data, Error>) -> ())
 /**
  Delegate for the HTTPClient, in case there is some action needed that does not concern the client itself.
  */
-public protocol HTTPClientProtocolDelegate: class {
+public protocol HTTPClientProtocolDelegate: AnyObject {
     
     /**
      Notifies the delegate that a HTTP 401 occurred and further action is needed to refresh the invalid authentication token.
@@ -74,8 +74,9 @@ public protocol HTTPClientProtocol {
     }
      ```
     */
-    func execute<T>(httpRequest: HTTPRequest,
-                    completionHandler: ExecuteCompletionType<T>?)
+    func execute<T>(httpRequest: HTTPRequest, completionHandler: ExecuteCompletionType<T>?)
+
+    func execute<T>(httpRequest: HTTPRequest) async throws -> HTTPClientResponse<T>
     
     /**
      Executes the REST call and decodes the response, returning the data through a completion handler.
@@ -98,6 +99,8 @@ public protocol HTTPClientProtocol {
      ```
     */
     func downloadData(for urlString: String, completionHandler: @escaping DownloadDataCompletionType)
+
+    func downloadData(for urlString: String) async throws -> Data
 }
 
 // MARK: - HTTPClient Implementation
@@ -137,6 +140,22 @@ public class HTTPClient: HTTPClientProtocol {
     
     // MARK: - Protocol Functions
     
+    public func execute<T>(httpRequest: HTTPRequest) async throws -> HTTPClientResponse<T> {
+        try await withCheckedThrowingContinuation { continuation in
+            execute(httpRequest: httpRequest) { result in
+                continuation.resume(with: result)
+            }
+        }
+    }
+
+    public func downloadData(for urlString: String) async throws -> Data {
+        try await withCheckedThrowingContinuation { continuation in
+            downloadData(for: urlString) { result in
+                continuation.resume(with: result)
+            }
+        }
+    }
+
     public func execute<T>(httpRequest: HTTPRequest, completionHandler: ExecuteCompletionType<T>?) {
         self.execute(httpRequest: httpRequest) { (response) in
             do {
@@ -147,7 +166,7 @@ public class HTTPClient: HTTPClientProtocol {
             }
         }
     }
-    
+
     public func downloadData(for urlString: String, completionHandler: @escaping DownloadDataCompletionType) {
         guard let url = URL(string: urlString) else {
             completionHandler(.failure(ResponseError.unsupportedURL))
